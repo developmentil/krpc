@@ -71,7 +71,7 @@ proto.genTransId = function(ip, port, callback) {
 			callback(new Error('Timeout'));
 		});
 
-		this.on(transId, function(err, rIp, rPort) {
+		this.on(transId, function(err, rIp, rPort, res) {
 			if(ip !== rIp && ip)
 				return;
 
@@ -83,7 +83,7 @@ proto.genTransId = function(ip, port, callback) {
 				clearTimeout(self._queryTimers[transId]);
 			}
 
-			callback.apply(null, arguments);
+			callback.call(null, err, res);
 		});
 	} else {
 		delete this._queryTimers[transId];
