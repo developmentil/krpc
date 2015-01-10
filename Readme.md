@@ -170,7 +170,7 @@ Emits when a parse error should send back to the querying node.
 
 ``` js
 krpc.on('parseError', function(transId, errorMsg, ip, port) {
-	var buffer = krpc.error(transId, krpc.Errors.PROTOCOL, errorMsg);
+	var buffer = krpc.error(transId, KRPC.Errors.PROTOCOL, errorMsg);
 	socket.send(buffer, 0, buffer.length, port, ip);
 });
 ```
