@@ -60,19 +60,6 @@ KRPC.Errors = {
 };
 ```
 
-Create a new `krpc` instance.
-
-If `opts` is specified, then the default options (shown below) will be overridden.
-
-``` js
-var KRPC = require('krpc');
-
-var krpc = new KRPC({
-  transBytes: 2,       // transaction id string length
-  queryTimeout: 2000   // in milliseconds, maximum time to wait for response
-});
-```
-
 
 #### KRPC.parse
 
