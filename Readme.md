@@ -2,7 +2,7 @@
 ==========
 
 Simple KRPC protocol implementaion of bencoded messages.
-See [BitTorent DHT spec.](http://www.bittorrent.org/beps/bep_0005.html) for more details
+See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html) for more details
 
 
 ## Install
@@ -14,7 +14,11 @@ See [BitTorent DHT spec.](http://www.bittorrent.org/beps/bep_0005.html) for more
 ## API
 
 
-#### `krpc = new KRPC([opts])`
+#### KRPC (constructor)
+
+``` js
+krpc = new KRPC([opts])
+```
 
 Create a new `krpc` instance.
 
@@ -24,13 +28,17 @@ If `opts` is specified, then the default options (shown below) will be overridde
 var KRPC = require('krpc');
 
 var krpc = new KRPC({
-  transBytes: 2,   // transaction id string length
-  queryTimeout: 2000 // in milliseconds, maximum time to wait for response
+  transBytes: 2,       // transaction id string length
+  queryTimeout: 2000   // in milliseconds, maximum time to wait for response
 });
 ```
 
 
-#### `krpc.parse(buffer, ip, port)`
+#### KRPC.parse
+
+``` js
+krpc.parse(buffer, ip, port);
+```
 
 Parse a massage. See events section for handling parsed messages.
 Returns the parsed message. Throws an error on failure.
@@ -46,7 +54,11 @@ socket.on('message', function(buffer, rinfo) {
 ```
 
 
-#### `transId = krpc.genTransId(ip, port, callback)`
+#### KRPC.genTransId
+
+``` js
+transId = krpc.genTransId(ip, port, callback);
+```
 
 Returns a new transaction id string.
 
@@ -65,7 +77,10 @@ var transId = krpc.genTransId('1.1.1.1', 20000, function(err, res) {
 ```
 
 
-### `buffer = krpc.query(transId, type, query)`
+### KRPC.query
+``` js
+buffer = krpc.query(transId, type, query);
+```
 
 Create an query message with type `type` and the query data `query`. Returns the
 message as `Buffer`.
@@ -78,7 +93,11 @@ socket.send(buffer, 0, buffer.length, 20000, '1.1.1.1');
 ```
 
 
-### `buffer = krpc.respond(transId, res)`
+### KRPC.respon
+
+``` js
+buffer = krpc.respond(transId, res);
+```
 
 Create a respond message with the data `res`. Returns the
 message as `Buffer`.
@@ -95,7 +114,11 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### `buffer = krpc.error(transId, errorCode, errorMsg)`
+### KRPC.error
+
+``` js
+buffer = krpc.error(transId, errorCode, errorMsg)
+```
 
 Create an error message with the code `errorCode` and message `errorMsg`. Returns the
 message as `Buffer`.
@@ -110,9 +133,11 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-## Events
+### KRPC.on('parseError')
 
-### `krpc.on('parseError', function(errorMsg, ip, port) { ... })`
+``` js
+krpc.on('parseError', function(errorMsg, ip, port) { ... })
+```
 
 Emits when a parse error should send back to the querying node.
 
@@ -124,12 +149,20 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-### `krpc.on('query', function(type, query, transId, ip, port) { ... })`
+### KRPC.on('query')
+
+``` js
+krpc.on('query', function(type, query, transId, ip, port) { ... })
+```
 
 Emits of each parsed query message.
 
 
-### `krpc.on('query_{type}', function(query, transId, ip, port) { ... })`
+### KRPC.on('query_{type}')
+
+``` js
+krpc.on('query_{type}', function(query, transId, ip, port) { ... })
+```
 
 Emits of each parsed query message with type `{type}`.
 
@@ -143,17 +176,29 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### `krpc.on('respond', function(res, transId, ip, port) { ... })`
+### KRPC.on('respond')
+
+``` js
+krpc.on('respond', function(res, transId, ip, port) { ... })
+```
 
 Emits of each parsed respond message.
 
 
-### `krpc.on('{transId}', function(err, ip, port, res) { ... })`
+### KRPC.on('{transId}')
+
+``` js
+krpc.on('{transId}', function(err, ip, port, res) { ... })
+```
 
 Emits of any parsed respond or error message with transaction id `{transId}`.
 
 
-### `krpc.on('error', function(errorCode, errorMsg, transId, ip, port) { ... })`
+### KRPC.on('error')
+
+``` js
+krpc.on('error', function(errorCode, errorMsg, transId, ip, port) { ... })
+```
 
 Emits of each parsed error message.
 
