@@ -13,6 +13,7 @@ See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html)
 
 ## API
   * [KRPC (constructor)](#krpc-constructor)
+  * [KRPC.Errors](#krpcerrors)
   * [KRPC.parse](#krpcparse)
   * [KRPC.genTransId](#krpcgenTransId)
   * [KRPC.query](#krpcquery)
@@ -30,6 +31,33 @@ See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html)
 
 ``` js
 krpc = new KRPC([opts])
+```
+
+Create a new `krpc` instance.
+
+If `opts` is specified, then the default options (shown below) will be overridden.
+
+``` js
+var KRPC = require('krpc');
+
+var krpc = new KRPC({
+  transBytes: 2,       // transaction id string length
+  queryTimeout: 2000   // in milliseconds, maximum time to wait for response
+});
+```
+
+
+#### KRPC.Errors
+
+KRPC default error codes:
+
+``` js
+KRPC.Errors = {
+	GENERIC:         201,
+	SERVER:          202,
+	PROTOCOL:        203,
+	METHOD_UNKNOWN:  204
+};
 ```
 
 Create a new `krpc` instance.
@@ -139,7 +167,7 @@ message as `Buffer`.
 
 ``` js
 krpc.on('parseError', function(transId, errorMsg, ip, port) {
-	var buffer = krpc.error(transId, krpc.Errors.PROTOCOL, errorMsg);
+	var buffer = krpc.error(transId, KRPC.Errors.PROTOCOL, errorMsg);
 	socket.send(buffer, 0, buffer.length, port, ip);
 });
 ```

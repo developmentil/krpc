@@ -23,10 +23,10 @@ var proto = exports.prototype;
 /*** constants ***/
 
 exports.Errors = {
-	GENERIC: 201,
-	SERVER: 202,
-	PROTOCOL: 203,
-	METHOD_UNKNOWN: 204
+	GENERIC:         201,
+	SERVER:          202,
+	PROTOCOL:        203,
+	METHOD_UNKNOWN:  204
 };
 
 
