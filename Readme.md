@@ -12,6 +12,18 @@ See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html)
 
 
 ## API
+	* [KRPC (constructor)](#krpc-constructor)
+	* [KRPC.parse](#krpcparse)
+	* [KRPC.genTransId](#krpcgenTransId)
+	* [KRPC.query](#krpcquery)
+	* [KRPC.respond](#krpcrespond)
+	* [KRPC.error](#krpcerror)
+	* [KRPC.on('parseError')](#krpconparseerror)
+	* [KRPC.on('query')](#krpconquery)
+	* [KRPC.on('query_{type}')](#krpconquery_type)
+	* [KRPC.on('respond')](#krpconrespond)
+	* [KRPC.on('{transId}')](#krpcontransid)
+	* [KRPC.on('error')](#krpconerror)
 
 
 #### KRPC (constructor)
@@ -93,7 +105,7 @@ socket.send(buffer, 0, buffer.length, 20000, '1.1.1.1');
 ```
 
 
-### KRPC.respon
+### KRPC.respond
 
 ``` js
 buffer = krpc.respond(transId, res);
