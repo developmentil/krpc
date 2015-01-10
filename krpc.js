@@ -10,8 +10,8 @@ module.exports = exports = function(options) {
 	
 	if(!options) options = {};
 	
-	this._transBytes = options.transBytes || 2;
-	this._nextTransId = crypto.randomBytes(this._transBytes);
+	this._transIdBytes = options.transIdBytes || 2;
+	this._nextTransId = crypto.randomBytes(this._transIdBytes);
 	
 	this._queryTimeout = options.queryTimeout || 2000;
 	this._queryTimers = {};
