@@ -1,4 +1,8 @@
 [KRPC.js](https://npmjs.org/package/krpc)
+[![Build Status](https://travis-ci.org/DevelopmentIL/krpc.svg?branch=master)](https://travis-ci.org/DevelopmentIL/krpc)
+[![npm](https://img.shields.io/npm/v/krpc.svg)](https://npmjs.org/package/krpc)
+[![npm](https://img.shields.io/npm/dm/krpc.svg)](https://npmjs.org/package/krpc)
+[![npm](https://img.shields.io/npm/l/krpc.svg)](https://npmjs.org/package/krpc)
 ==========
 
 Simple KRPC protocol implementaion of bencoded messages.
