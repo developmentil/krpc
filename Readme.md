@@ -1,13 +1,12 @@
-KRPC.js
-==========
+# KRPC.js
 
 [![build](https://img.shields.io/travis/DevelopmentIL/krpc.svg)](https://travis-ci.org/DevelopmentIL/krpc)
 [![npm](https://img.shields.io/npm/v/krpc.svg)](https://npmjs.org/package/krpc)
 [![npm](https://img.shields.io/npm/dm/krpc.svg)](https://npmjs.org/package/krpc)
 [![npm](https://img.shields.io/npm/l/krpc.svg)](https://github.com/DevelopmentIL/krpc/blob/master/LICENSE)
 
-Simple KRPC protocol implementaion of bencoded messages.
-See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html) for more details
+Simple KRPC protocol implementation of bencoded messages.
+See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html) for more details.
 
 
 ## Install
@@ -19,17 +18,17 @@ See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html)
 ## API
   * [KRPC (constructor)](#krpc-constructor)
   * [KRPC.Errors](#krpcerrors)
-  * [KRPC.parse](#krpcparse)
-  * [KRPC.genTransId](#krpcgenTransId)
-  * [KRPC.query](#krpcquery)
-  * [KRPC.respond](#krpcrespond)
-  * [KRPC.error](#krpcerror)
-  * [KRPC.on('parseError')](#krpconparseerror)
-  * [KRPC.on('query')](#krpconquery)
-  * [KRPC.on('query_{type}')](#krpconquery_type)
-  * [KRPC.on('respond')](#krpconrespond)
-  * [KRPC.on('{transId}')](#krpcontransid)
-  * [KRPC.on('error')](#krpconerror)
+  * [krpc.parse](#krpcparse)
+  * [krpc.genTransId](#krpcgenTransId)
+  * [krpc.query](#krpcquery)
+  * [krpc.respond](#krpcrespond)
+  * [krpc.error](#krpcerror)
+  * [krpc.on('parseError')](#krpconparseerror)
+  * [krpc.on('query')](#krpconquery)
+  * [krpc.on('query_{type}')](#krpconquery_type)
+  * [krpc.on('respond')](#krpconrespond)
+  * [krpc.on('{transId}')](#krpcontransid)
+  * [krpc.on('error')](#krpconerror)
 
 
 #### KRPC (constructor)
@@ -66,7 +65,7 @@ KRPC.Errors = {
 ```
 
 
-#### KRPC.parse
+#### krpc.parse
 
 ``` js
 krpc.parse(buffer, ip, port);
@@ -86,7 +85,7 @@ socket.on('message', function(buffer, rinfo) {
 ```
 
 
-#### KRPC.genTransId
+#### krpc.genTransId
 
 ``` js
 transId = krpc.genTransId([ip], [port], callback, [timeout]);
@@ -114,7 +113,7 @@ var transId = krpc.genTransId('1.1.1.1', 20000, function(err, res) {
 ```
 
 
-### KRPC.query
+### krpc.query
 ``` js
 buffer = krpc.query(transId, type, query);
 ```
@@ -130,7 +129,7 @@ socket.send(buffer, 0, buffer.length, 20000, '1.1.1.1');
 ```
 
 
-### KRPC.respond
+### krpc.respond
 
 ``` js
 buffer = krpc.respond(transId, res);
@@ -151,7 +150,7 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### KRPC.error
+### krpc.error
 
 ``` js
 buffer = krpc.error(transId, errorCode, errorMsg)
@@ -170,7 +169,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-### KRPC.on('parseError')
+### krpc.on('parseError')
 
 ``` js
 krpc.on('parseError', function(transId, errorMsg, ip, port) { ... })
@@ -186,7 +185,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-### KRPC.on('query')
+### krpc.on('query')
 
 ``` js
 krpc.on('query', function(type, query, transId, ip, port) { ... })
@@ -195,7 +194,7 @@ krpc.on('query', function(type, query, transId, ip, port) { ... })
 Emits for each parsed query message.
 
 
-### KRPC.on('query_{type}')
+### krpc.on('query_{type}')
 
 ``` js
 krpc.on('query_{type}', function(query, transId, ip, port) { ... })
@@ -213,7 +212,7 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### KRPC.on('respond')
+### krpc.on('respond')
 
 ``` js
 krpc.on('respond', function(res, transId, ip, port) { ... })
@@ -222,7 +221,7 @@ krpc.on('respond', function(res, transId, ip, port) { ... })
 Emits for each parsed respond message.
 
 
-### KRPC.on('{transId}')
+### krpc.on('{transId}')
 
 ``` js
 krpc.on('{transId}', function(err, ip, port, res) { ... })
@@ -231,7 +230,7 @@ krpc.on('{transId}', function(err, ip, port, res) { ... })
 Emits for each parsed respond or error message with transaction id `{transId}` has hex string.
 
 
-### KRPC.on('error')
+### krpc.on('error')
 
 ``` js
 krpc.on('error', function(errorCode, errorMsg, transId, ip, port) { ... })
