@@ -46,9 +46,20 @@ proto.parse = function(buffer, ip, port) {
 	return msg;
 };
 
-proto.genTransId = function(ip, port, callback) {
+proto.genTransId = function(ip, port, callback, timeout) {
 	var self = this,
-	transId = this._nextTransId.toString();
+	transId = this._nextTransId.toString('ascii');
+	
+	if(typeof ip === 'function') {
+		callback = ip;
+		timeout = port;
+		ip = null;
+		port = null;
+	} else if(typeof port === 'function') {
+		callback = port;
+		timeout = callback;
+		port = null;
+	}
 	
 	// increase _nextTransId
 	for(var i = 0; i < this._nextTransId.length; i++) {
@@ -66,25 +77,35 @@ proto.genTransId = function(ip, port, callback) {
 	}
 	
 	if(typeof callback === 'function') {
-		this._queryTimers[transId] = setTimeout(function() {
-			delete self._queryTimers[transId];
-			callback(new Error('Timeout'));
-		});
-
-		this.on(transId, function(err, rIp, rPort, res) {
+		var listener = function(err, rIp, rPort, res) {
 			if(ip !== rIp && ip)
 				return;
 
 			if(port !== rPort && port)
 				return;
 
-			if(self._queryTimers[transId]) {
+			if(self._queryTimers[transId])
 				delete self._queryTimers[transId];
-				clearTimeout(self._queryTimers[transId]);
-			}
 
 			callback.call(null, err, res);
-		});
+		};
+		
+		if(timeout === undefined)
+			timeout = this._queryTimeout;
+		
+		if(timeout) {
+			this._queryTimers[transId] = setTimeout(function() {
+				self.removeListener(transId, listener);
+				
+				if(!self._queryTimers[transId])
+					return;
+				
+				delete self._queryTimers[transId];
+				callback(new Error('Timeout'));
+			}, timeout);
+		}
+
+		this.on(transId, listener);
 	} else {
 		delete this._queryTimers[transId];
 	}
@@ -93,7 +114,7 @@ proto.genTransId = function(ip, port, callback) {
 };
 
 proto.query = function(transId, type, query) {
-	this.encode({
+	return this.encode({
 		t: transId,
 		y: 'q',
 		q: type,
@@ -102,7 +123,7 @@ proto.query = function(transId, type, query) {
 };
 
 proto.respond = function(transId, res) {
-	this.encode({
+	return this.encode({
 		t: transId,
 		y: 'r',
 		r: res
@@ -110,7 +131,7 @@ proto.respond = function(transId, res) {
 };
 
 proto.error = function(transId, errorCode, errorMsg) {
-	this.encode({
+	return this.encode({
 		t: transId,
 		y: 'e',
 		e: [errorCode, errorMsg]
@@ -121,8 +142,8 @@ proto.encode = function(msg) {
 	return bencode.encode(msg);
 };
 
-proto.decode = function(buffer) {
-	return bencode.decode(buffer);
+proto.decode = function(buffer, encoding) {
+	return bencode.decode(buffer, encoding || 'utf8');
 };
 
 
@@ -130,12 +151,12 @@ proto.decode = function(buffer) {
 
 proto._parseType_q = function(msg, ip, port) {
 	if(!msg.q) {
-		this.emit('parseError', 'Missing query type', ip, port);
+		this.emit('parseError', msg.t, 'Missing query type', ip, port);
 		throw new Error('Missing query type');
 	}
 		
 	if(!msg.a) {
-		this.emit('parseError', 'Missing query data', ip, port);
+		this.emit('parseError', msg.t, 'Missing query data', ip, port);
 		throw new Error('Missing query data');
 	}
 		

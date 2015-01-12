@@ -84,16 +84,21 @@ socket.on('message', function(buffer, rinfo) {
 #### KRPC.genTransId
 
 ``` js
-transId = krpc.genTransId(ip, port, callback);
+transId = krpc.genTransId([ip], [port], callback, [timeout]);
 ```
 
 Returns a new transaction id string.
 
 `callback(err, res)` will be called when a parsed message with that transaction 
-id will parse.
+id will parse within the query timeout. If no message received within timeout 
+a callback with an `err` will be called.
 
 If `ip` or `port` are not `null` callback would be called only if the message 
 received form that ip and port.
+
+You may set `timeout` and change the default timeout `queryTimeout` that given 
+on the constructor. Set `timeout` to `null` will disable the timeout for this 
+transaction.
 
 ``` js
 var transId = krpc.genTransId('1.1.1.1', 20000, function(err, res) {
@@ -163,7 +168,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ### KRPC.on('parseError')
 
 ``` js
-krpc.on('parseError', function(errorMsg, ip, port) { ... })
+krpc.on('parseError', function(transId, errorMsg, ip, port) { ... })
 ```
 
 Emits when a parse error should send back to the querying node.
@@ -182,7 +187,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 krpc.on('query', function(type, query, transId, ip, port) { ... })
 ```
 
-Emits of each parsed query message.
+Emits for each parsed query message.
 
 
 ### KRPC.on('query_{type}')
@@ -191,7 +196,7 @@ Emits of each parsed query message.
 krpc.on('query_{type}', function(query, transId, ip, port) { ... })
 ```
 
-Emits of each parsed query message with type `{type}`.
+Emits for each parsed query message with type `{type}`.
 
 ``` js
 krpc.on('query_ping', function(query, transId, ip, port) {
@@ -209,7 +214,7 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 krpc.on('respond', function(res, transId, ip, port) { ... })
 ```
 
-Emits of each parsed respond message.
+Emits for each parsed respond message.
 
 
 ### KRPC.on('{transId}')
@@ -218,7 +223,7 @@ Emits of each parsed respond message.
 krpc.on('{transId}', function(err, ip, port, res) { ... })
 ```
 
-Emits of any parsed respond or error message with transaction id `{transId}`.
+Emits for each parsed respond or error message with transaction id `{transId}`.
 
 
 ### KRPC.on('error')
@@ -227,7 +232,7 @@ Emits of any parsed respond or error message with transaction id `{transId}`.
 krpc.on('error', function(errorCode, errorMsg, transId, ip, port) { ... })
 ```
 
-Emits of each parsed error message.
+Emits for each parsed error message.
 
 
 
