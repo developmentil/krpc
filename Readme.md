@@ -92,7 +92,7 @@ socket.on('message', function(buffer, rinfo) {
 transId = krpc.genTransId([ip], [port], callback, [timeout]);
 ```
 
-Returns a new transaction id string.
+Returns a new transaction id as buffer.
 
 `callback(err, res)` will be called when a parsed message with that transaction 
 id will parse within the query timeout. If no message received within timeout 
@@ -228,7 +228,7 @@ Emits for each parsed respond message.
 krpc.on('{transId}', function(err, ip, port, res) { ... })
 ```
 
-Emits for each parsed respond or error message with transaction id `{transId}`.
+Emits for each parsed respond or error message with transaction id `{transId}` has hex string.
 
 
 ### KRPC.on('error')

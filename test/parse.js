@@ -1,11 +1,9 @@
-process.env.NODE_ENV = 'test';
-
-var KRPC = require('../krpc');
 	
 describe('KRPC', function() {
-	var krpc;
+	var KRPC, krpc;
 	
 	before(function() {
+		KRPC = require('../krpc');
 		krpc = new KRPC();
 	});
 
@@ -24,10 +22,10 @@ describe('KRPC', function() {
 		it('should emit "parseError" and throw an error', function() {
 			var refs = 0,
 			
-			myTransId = 'aa', myIp = '1.1.1.1', myPort = 20000;
+			myTransId = new Buffer('aa'), myIp = '1.1.1.1', myPort = 20000;
 			
 			krpc.once('parseError', function(transId, errorMsg, ip, port) {
-				transId.should.equal(myTransId);
+				transId.toString('hex').should.equal(myTransId.toString('hex'));
 				errorMsg.should.be.a.String;
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
@@ -48,13 +46,14 @@ describe('KRPC', function() {
 		it('should emit "query" and "query_{type}"', function() {
 			var refs = 0,
 			
-			myTransId = 'aa', myType = 'myType', myQuery = {foo: 'bar'},
+			myTransId = new Buffer('aa'), 
+			myType = 'myType', myQuery = {foo: 123456},
 			myIp = '1.1.1.1', myPort = 20000;
 			
 			krpc.once('query', function(type, query, transId, ip, port) {
 				type.should.equal(myType);
-				query.should.equal(query);
-				transId.should.equal(myTransId);
+				query.should.eql(myQuery);
+				transId.toString('hex').should.equal(myTransId.toString('hex'));
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
 				
@@ -62,8 +61,8 @@ describe('KRPC', function() {
 			});
 			
 			krpc.once('query_' + myType, function(query, transId, ip, port) {
-				query.should.equal(query);
-				transId.should.equal(myTransId);
+				query.should.eql(myQuery);
+				transId.toString('hex').should.equal(myTransId.toString('hex'));
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
 				
@@ -79,19 +78,19 @@ describe('KRPC', function() {
 		it('should emit "respond" and "{transId}"', function() {
 			var refs = 0,
 			
-			myTransId = 'aa', myRes = {foo: 'bar'},
+			myTransId = new Buffer('aa'), myRes = {foo: 123456},
 			myIp = '1.1.1.1', myPort = 20000;
 			
 			krpc.once('respond', function(res, transId, ip, port) {
 				res.should.eql(myRes);
-				transId.should.equal(myTransId);
+				transId.toString('hex').should.equal(myTransId.toString('hex'));
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
 				
 				refs++;
 			});
 			
-			krpc.once(myTransId, function(err, ip, port, res) {
+			krpc.once(myTransId.toString('hex'), function(err, ip, port, res) {
 				(err === null).should.be.true;
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
@@ -109,20 +108,21 @@ describe('KRPC', function() {
 		it('should emit "error" and "{transId}"', function() {
 			var refs = 0,
 			
-			myTransId = 'aa', myErrorCode = 123, myErrorMsg = 'my message',
+			myTransId = new Buffer('aa'), 
+			myErrorCode = 123, myErrorMsg = 'my message',
 			myIp = '1.1.1.1', myPort = 20000;
 			
 			krpc.once('error', function(errorCode, errorMsg, transId, ip, port) {
-				errorCode.should.eql(myErrorCode);
-				errorMsg.should.eql(myErrorMsg);
-				transId.should.equal(myTransId);
+				errorCode.should.equal(myErrorCode);
+				errorMsg.should.equal(myErrorMsg);
+				transId.toString('hex').should.equal(myTransId.toString('hex'));
 				ip.should.equal(myIp);
 				port.should.equal(myPort);
 				
 				refs++;
 			});
 			
-			krpc.once(myTransId, function(err, ip, port, res) {
+			krpc.once(myTransId.toString('hex'), function(err, ip, port, res) {
 				(err !== null).should.be.true;
 				err.code.should.equal(myErrorCode);
 				err.message.should.equal(myErrorMsg);
@@ -134,6 +134,38 @@ describe('KRPC', function() {
 			});
 			
 			var buffer = krpc.error(myTransId, myErrorCode, myErrorMsg);
+			krpc.parse(buffer, myIp, myPort);
+			
+			refs.should.equal(2);
+		});
+		
+		it('should parse any transaction id', function() {
+			var refs = 0,
+			
+			myTransId = 123456, 
+			myType = 'myType', myQuery = {foo: 123456},
+			myIp = '1.1.1.1', myPort = 20000;
+			
+			krpc.once('query', function(type, query, transId, ip, port) {
+				type.should.equal(myType);
+				query.should.eql(myQuery);
+				transId.should.equal(myTransId);
+				ip.should.equal(myIp);
+				port.should.equal(myPort);
+				
+				refs++;
+			});
+			
+			krpc.once('query_' + myType, function(query, transId, ip, port) {
+				query.should.eql(myQuery);
+				transId.should.equal(myTransId);
+				ip.should.equal(myIp);
+				port.should.equal(myPort);
+				
+				refs++;
+			});
+			
+			var buffer = krpc.query(myTransId, myType, myQuery);
 			krpc.parse(buffer, myIp, myPort);
 			
 			refs.should.equal(2);

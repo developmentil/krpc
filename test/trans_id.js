@@ -1,14 +1,13 @@
-process.env.NODE_ENV = 'test';
-
-var KRPC = require('../krpc');
 	
 describe('KRPC', function() {
-	var krpc,
+	var KRPC, krpc,
 	
 	transIdBytes = 4,
 	queryTimeout = 10;
 	
 	before(function() {
+		KRPC = require('../krpc');
+		
 		krpc = new KRPC({
 			transIdBytes: transIdBytes,
 			queryTimeout: queryTimeout
@@ -25,10 +24,11 @@ describe('KRPC', function() {
 				done();
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 			
-			krpc.emit(transId, null, '1.1.1.1', 20000, resSend);
+			var transIdHex = transId.toString('hex');
+			krpc.emit(transIdHex, null, '1.1.1.1', 20000, resSend);
 		});
 		
 		it('should callback with timeout error', function(done) {
@@ -43,7 +43,7 @@ describe('KRPC', function() {
 				done();
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 		});
 		
@@ -61,7 +61,7 @@ describe('KRPC', function() {
 				done();
 			}, timeout);
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 		});
 		
@@ -75,11 +75,12 @@ describe('KRPC', function() {
 				done();
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 			
-			krpc.emit(transId, null, '1.1.1.2', 20000, '1.1.1.2');
-			krpc.emit(transId, null, ip, 20000, ip);
+			var transIdHex = transId.toString('hex');
+			krpc.emit(transIdHex, null, '1.1.1.2', 20000, '1.1.1.2');
+			krpc.emit(transIdHex, null, ip, 20000, ip);
 		});
 		
 		it('should filter port', function(done) {
@@ -93,12 +94,13 @@ describe('KRPC', function() {
 				done();
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 			
-			krpc.emit(transId, null, '1.1.1.2', port, {ip: '1.1.1.2', port: port});
-			krpc.emit(transId, null, ip, 5000, {ip: ip, port: 5000});
-			krpc.emit(transId, null, ip, port, {ip: ip, port: port});
+			var transIdHex = transId.toString('hex');
+			krpc.emit(transIdHex, null, '1.1.1.2', port, {ip: '1.1.1.2', port: port});
+			krpc.emit(transIdHex, null, ip, 5000, {ip: ip, port: 5000});
+			krpc.emit(transIdHex, null, ip, port, {ip: ip, port: port});
 		});
 		
 		it('should receive multiple messages', function(done) {
@@ -112,24 +114,31 @@ describe('KRPC', function() {
 					done();
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 			
+			var transIdHex = transId.toString('hex');
 			for(var i = count; i > 0; i--) {
-				krpc.emit(transId, null, '1.1.1.2', 20000, i);
+				krpc.emit(transIdHex, null, '1.1.1.2', 20000, i);
 			}
 		});
 		
 		it('should not receive messages after timeout', function(done) {
-			var transId = krpc.genTransId(function(err, i) {
+			var refs = 0,
+			
+			transId = krpc.genTransId(function(err, i) {
 				(err !== null).should.be.true;
+				refs++;
 			});
 			
-			transId.should.be.a.String;
+			transId.should.be.an.instanceOf(Buffer);
 			transId.should.have.length(transIdBytes);
 			
 			setTimeout(function() {
-				krpc.emit(transId, null, '1.1.1.1', 20000, resSend);
+				var transIdHex = transId.toString('hex');
+				krpc.emit(transIdHex, null, '1.1.1.1', 20000, resSend);
+				
+				refs.should.be.equal(1);
 				done();
 			}, queryTimeout + 5);
 		});

@@ -48,7 +48,8 @@ proto.parse = function(buffer, ip, port) {
 
 proto.genTransId = function(ip, port, callback, timeout) {
 	var self = this,
-	transId = this._nextTransId.toString('ascii');
+	transId = this._nextTransId.toString('hex'),
+	transIdBuffer = new Buffer(transId, 'hex');
 	
 	if(typeof ip === 'function') {
 		callback = ip;
@@ -71,10 +72,10 @@ proto.genTransId = function(ip, port, callback, timeout) {
 		this._nextTransId[i] = 0x00;
 	}
 	
-	if(this._queryTimers[transId]) {
-		this.emit(transId, new Error('Timeout'));
-		this.removeAllListeners(transId);
-	}
+//	if(this._queryTimers[transId]) {
+//		this.emit(transId, new Error('Timeout'));
+//		this.removeAllListeners(transId);
+//	}
 	
 	if(typeof callback === 'function') {
 		var listener = function(err, rIp, rPort, res) {
@@ -110,7 +111,7 @@ proto.genTransId = function(ip, port, callback, timeout) {
 		delete this._queryTimers[transId];
 	}
 	
-	return transId;
+	return transIdBuffer;
 };
 
 proto.query = function(transId, type, query) {
@@ -142,15 +143,15 @@ proto.encode = function(msg) {
 	return bencode.encode(msg);
 };
 
-proto.decode = function(buffer, encoding) {
-	return bencode.decode(buffer, encoding || 'utf8');
+proto.decode = function(buffer) {
+	return bencode.decode(buffer);
 };
 
 
 /*** protected methods ***/ 
 
 proto._parseType_q = function(msg, ip, port) {
-	if(!msg.q) {
+	if(!(msg.q instanceof Buffer)) {
 		this.emit('parseError', msg.t, 'Missing query type', ip, port);
 		throw new Error('Missing query type');
 	}
@@ -159,29 +160,34 @@ proto._parseType_q = function(msg, ip, port) {
 		this.emit('parseError', msg.t, 'Missing query data', ip, port);
 		throw new Error('Missing query data');
 	}
+	
+	var type = msg.q.toString();
 		
-	this.emit('query', msg.q, msg.a, msg.t, ip, port);
-	this.emit('query_' + msg.q, msg.a, msg.t, ip, port);
+	this.emit('query', type, msg.a, msg.t, ip, port);
+	this.emit('query_' + type, msg.a, msg.t, ip, port);
 };
 
 proto._parseType_r = function(msg, ip, port) {
 	if(!msg.r)
 		throw new Error('Missing respond data');
-		
+	
 	this.emit('respond', msg.r, msg.t, ip, port);
-	this.emit(msg.t, null, ip, port, msg.r);
+	this.emit(msg.t.toString('hex'), null, ip, port, msg.r);
 };
 
 proto._parseType_e = function(msg, ip, port) {
-	if(!Array.isArray(msg.e) || msg.e.length !== 2)
+	if(!Array.isArray(msg.e) || msg.e.length !== 2 || typeof msg.e[0] !== 'number')
 		throw new Error('Invaild error data');
 		
 	
-	var err = new Error(msg.e[1] || 'Unknown Error');
-	err.code = msg.e[0];
+	var code = msg.e[0],
+	message = msg.e[1] ? msg.e[1].toString() : 'Unknown Error',
 	
-	this.emit('error', msg.e[0], msg.e[1], msg.t, ip, port);
-	this.emit(msg.t, err, ip, port);
+	err = new Error(message);
+	err.code = code;
+	
+	this.emit('error', code, message, msg.t, ip, port);
+	this.emit(msg.t.toString('hex'), err, ip, port);
 };
 
 
