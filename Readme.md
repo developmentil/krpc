@@ -1,7 +1,7 @@
 KRPC.js
 ==========
 
-[![Build Status](https://travis-ci.org/DevelopmentIL/krpc.svg?branch=master)](https://travis-ci.org/DevelopmentIL/krpc)
+[![build](https://img.shields.io/travis/DevelopmentIL/krpc.svg)](https://travis-ci.org/DevelopmentIL/krpc)
 [![npm](https://img.shields.io/npm/v/krpc.svg)](https://npmjs.org/package/krpc)
 [![npm](https://img.shields.io/npm/dm/krpc.svg)](https://npmjs.org/package/krpc)
 [![npm](https://img.shields.io/npm/l/krpc.svg)](https://github.com/DevelopmentIL/krpc/blob/master/LICENSE)
