@@ -14,6 +14,7 @@ describe('KRPC', function() {
 				krpc.parse(new Buffer(2), '1.1.1.1', 20000);
 			} catch(err) {
 				err.should.be.an.instanceof(Error);
+				err.should.not.be.an.instanceof(KRPC.ForeignError);
 				return;
 			}
 			
@@ -63,6 +64,7 @@ describe('KRPC', function() {
 				krpc.parse(krpc.encode({t: myTransId, y: 'q'}), myIp, myPort);
 			} catch(err) {
 				err.should.be.an.instanceof(Error);
+				err.should.not.be.an.instanceof(KRPC.ForeignError);
 				refs.should.equal(1);
 				return;
 			}

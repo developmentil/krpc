@@ -72,7 +72,7 @@ KRPC.Errors = {
 err = new KRPC.ForeignError(caughtError);
 ```
 
-An `Error` class for foreign errors that caught will parsing messages.
+An `Error` class for foreign errors that caught while parsing messages.
 
 ``` js
 socket.on('message', function(buffer, rinfo) {
@@ -95,7 +95,8 @@ krpc.parse(buffer, ip, port);
 ```
 
 Parse a massage. See events section for handling parsed messages.
-Returns the parsed message. Throws an error on failure.
+Returns the parsed message. Throws an `Error` on failure or `ForeignError` when
+some emit throws an error.
 
 ``` js
 socket.on('message', function(buffer, rinfo) {
