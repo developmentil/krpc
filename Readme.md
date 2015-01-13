@@ -91,7 +91,7 @@ socket.on('message', function(buffer, rinfo) {
 transId = krpc.genTransId([ip], [port], callback, [timeout]);
 ```
 
-Returns a new transaction id as buffer.
+Returns a new transaction id as `Buffer`.
 
 `callback(err, res)` will be called when a parsed message with that transaction 
 id will parse within the query timeout. If no message received within timeout 
@@ -113,7 +113,7 @@ var transId = krpc.genTransId('1.1.1.1', 20000, function(err, res) {
 ```
 
 
-### krpc.query
+#### krpc.query
 ``` js
 buffer = krpc.query(transId, type, query);
 ```
@@ -129,7 +129,7 @@ socket.send(buffer, 0, buffer.length, 20000, '1.1.1.1');
 ```
 
 
-### krpc.respond
+#### krpc.respond
 
 ``` js
 buffer = krpc.respond(transId, res);
@@ -150,7 +150,7 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### krpc.error
+#### krpc.error
 
 ``` js
 buffer = krpc.error(transId, errorCode, errorMsg)
@@ -169,7 +169,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-### krpc.on('parseError')
+#### krpc.on('parseError')
 
 ``` js
 krpc.on('parseError', function(transId, errorMsg, ip, port) { ... })
@@ -185,7 +185,7 @@ krpc.on('parseError', function(transId, errorMsg, ip, port) {
 ```
 
 
-### krpc.on('query')
+#### krpc.on('query')
 
 ``` js
 krpc.on('query', function(type, query, transId, ip, port) { ... })
@@ -194,7 +194,7 @@ krpc.on('query', function(type, query, transId, ip, port) { ... })
 Emits for each parsed query message.
 
 
-### krpc.on('query_{type}')
+#### krpc.on('query_{type}')
 
 ``` js
 krpc.on('query_{type}', function(query, transId, ip, port) { ... })
@@ -212,7 +212,7 @@ krpc.on('query_ping', function(query, transId, ip, port) {
 ```
 
 
-### krpc.on('respond')
+#### krpc.on('respond')
 
 ``` js
 krpc.on('respond', function(res, transId, ip, port) { ... })
@@ -221,7 +221,7 @@ krpc.on('respond', function(res, transId, ip, port) { ... })
 Emits for each parsed respond message.
 
 
-### krpc.on('{transId}')
+#### krpc.on('{transId}')
 
 ``` js
 krpc.on('{transId}', function(err, ip, port, res) { ... })
@@ -230,7 +230,7 @@ krpc.on('{transId}', function(err, ip, port, res) { ... })
 Emits for each parsed respond or error message with transaction id `{transId}` has hex string.
 
 
-### krpc.on('error')
+#### krpc.on('error')
 
 ``` js
 krpc.on('error', function(errorCode, errorMsg, transId, ip, port) { ... })
@@ -241,7 +241,7 @@ Emits for each parsed error message.
 
 
 
-### License
+## License
 
 KRPC.js is freely distributable under the terms of the MIT license.
 
