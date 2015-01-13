@@ -18,6 +18,7 @@ See [BitTorent DHT specifications](http://www.bittorrent.org/beps/bep_0005.html)
 ## API
   * [KRPC (constructor)](#krpc-constructor)
   * [KRPC.Errors](#krpcerrors)
+  * [KRPC.ForeignError](#krpcforeignerror)
   * [krpc.parse](#krpcparse)
   * [krpc.genTransId](#krpcgentransid)
   * [krpc.query](#krpcquery)
@@ -65,6 +66,28 @@ KRPC.Errors = {
 ```
 
 
+#### KRPC.ForeignError
+
+``` js
+err = new KRPC.ForeignError(caughtError);
+```
+
+An `Error` class for foreign errors that caught will parsing messages.
+
+``` js
+socket.on('message', function(buffer, rinfo) {
+	try {
+		krpc.parse(buffer, rinfo.address, rinfo.port);
+	} catch(err) {
+		if(err instanceof KRPC.ForeignError)
+			throw err.error;
+
+		// else, ignore errors
+	}
+});
+```
+
+
 #### krpc.parse
 
 ``` js
@@ -79,7 +102,10 @@ socket.on('message', function(buffer, rinfo) {
 	try {
 		krpc.parse(buffer, rinfo.address, rinfo.port);
 	} catch(err) {
-		// ignore errors
+		if(err instanceof KRPC.ForeignError)
+			throw err.error;
+
+		// else, ignore errors
 	}
 });
 ```

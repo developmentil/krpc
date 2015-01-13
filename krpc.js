@@ -10,7 +10,7 @@ module.exports = exports = function(options) {
 	
 	if(!options) options = {};
 	
-	this._transIdBytes = options.transIdBytes || 2;
+	this._transIdBytes = options.transIdBytes || TRANS_ID_BYTES;
 	this._nextTransId = crypto.randomBytes(this._transIdBytes);
 	
 	this._queryTimeout = options.queryTimeout || 2000;
@@ -28,6 +28,17 @@ exports.Errors = {
 	PROTOCOL:        203,
 	METHOD_UNKNOWN:  204
 };
+
+
+/*** foreign error ***/
+
+exports.ForeignError = function(err) {
+	Error.call(this, 'Foreign Error' 
+			+ (err && err.message ? ': ' + err.message : ''));
+	
+	this.error = err;
+};
+util.inherits(exports.ForeignError, Error);
 
 
 /*** public methods ***/
@@ -162,17 +173,25 @@ proto._parseType_q = function(msg, ip, port) {
 	}
 	
 	var type = msg.q.toString();
-		
-	this.emit('query', type, msg.a, msg.t, ip, port);
-	this.emit('query_' + type, msg.a, msg.t, ip, port);
+	
+	try {
+		this.emit('query', type, msg.a, msg.t, ip, port);
+		this.emit('query_' + type, msg.a, msg.t, ip, port);
+	} catch(err) {
+		throw new exports.ForeignError(err);
+	}
 };
 
 proto._parseType_r = function(msg, ip, port) {
 	if(!msg.r)
 		throw new Error('Missing respond data');
 	
-	this.emit('respond', msg.r, msg.t, ip, port);
-	this.emit(msg.t.toString('hex'), null, ip, port, msg.r);
+	try {
+		this.emit('respond', msg.r, msg.t, ip, port);
+		this.emit(msg.t.toString('hex'), null, ip, port, msg.r);
+	} catch(err) {
+		throw new exports.ForeignError(err);
+	}
 };
 
 proto._parseType_e = function(msg, ip, port) {
@@ -186,8 +205,12 @@ proto._parseType_e = function(msg, ip, port) {
 	err = new Error(message);
 	err.code = code;
 	
-	this.emit('error', code, message, msg.t, ip, port);
-	this.emit(msg.t.toString('hex'), err, ip, port);
+	try {
+		this.emit('error', code, message, msg.t, ip, port);
+		this.emit(msg.t.toString('hex'), err, ip, port);
+	} catch(err) {
+		throw new exports.ForeignError(err);
+	}
 };
 
 

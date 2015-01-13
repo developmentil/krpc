@@ -13,6 +13,32 @@ describe('KRPC', function() {
 			try {
 				krpc.parse(new Buffer(2), '1.1.1.1', 20000);
 			} catch(err) {
+				err.should.be.an.instanceof(Error);
+				return;
+			}
+			
+			throw new Error('Parse should throw an error');
+		});
+		
+		it('should throw a ForeignError', function() {
+			var refs = 0, tada = new Error('Tada!');
+			
+			krpc.once('query_error', function() {
+				throw tada;
+			});
+			
+			krpc.once('parseError', function() {
+				refs++;
+			});
+			
+			var buffer = krpc.query(new Buffer('aa'), 'error', {foo: 123456});
+			
+			try {
+				krpc.parse(buffer, '1.1.1.1', 20000);
+			} catch(err) {
+				refs.should.equal(0);
+				err.should.be.an.instanceof(KRPC.ForeignError);
+				err.error.should.equal(tada);
 				return;
 			}
 			
@@ -36,6 +62,7 @@ describe('KRPC', function() {
 			try {
 				krpc.parse(krpc.encode({t: myTransId, y: 'q'}), myIp, myPort);
 			} catch(err) {
+				err.should.be.an.instanceof(Error);
 				refs.should.equal(1);
 				return;
 			}
